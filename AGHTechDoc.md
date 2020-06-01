@@ -24,12 +24,13 @@ Contents:
 	* Delete client
 	* API: Find clients by IP
 * Enable DHCP server
-	* "Show DHCP interfaces" command
-	* "Show DHCP status" command
-	* "Check DHCP" command
-	* "Enable DHCP" command
+	* DHCP Custom Options
+	* API: Show DHCP interfaces
+	* API: Show DHCP status
+	* API: Check DHCP
+	* API: Enable DHCP
 	* Static IP check/set
-	* Add a static lease
+	* API: Add a static lease
 	* API: Reset DHCP configuration
 * DNS general settings
 	* API: Get DNS general settings
@@ -412,7 +413,21 @@ Algorithm:
 * UI shows the status
 
 
-### "Show DHCP interfaces" command
+### DHCP Custom Options
+
+Option with arbitrary hexadecimal data:
+
+	DEC_CODE hex HEX_DATA
+
+where DEC_CODE is a decimal DHCPv4 code in range [1..255]
+
+Option with IP data (only 1 IP is supported):
+
+	DEC_CODE ip IP_ADDR
+
+
+
+### API: Show DHCP interfaces
 
 Request:
 
@@ -435,7 +450,7 @@ Response:
 	}
 
 
-### "Show DHCP status" command
+### API: Show DHCP status
 
 Request:
 
@@ -470,7 +485,7 @@ Response:
 	}
 
 
-### "Check DHCP" command
+### API: Check DHCP
 
 Request:
 
@@ -518,7 +533,7 @@ If `static_ip.static` is:
 		In order to use DHCP server a static IP address must be set.  We failed to determine if this network interface is configured using static IP address.  Please set a static IP address manually.
 
 
-### "Enable DHCP" command
+### API: Enable DHCP
 
 Request:
 
@@ -645,7 +660,7 @@ or:
 	systemctl restart system-networkd
 
 
-### Add a static lease
+### API: Add a static lease
 
 Request:
 
