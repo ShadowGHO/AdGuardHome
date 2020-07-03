@@ -12,6 +12,7 @@ Contents:
 * Updating
 	* Get version command
 	* Update command
+* API: Get global status
 * TLS
 	* API: Get TLS configuration
 	* API: Set TLS configuration
@@ -23,6 +24,7 @@ Contents:
 	* Delete client
 	* API: Find clients by IP
 * Enable DHCP server
+	* "Show DHCP interfaces" command
 	* "Show DHCP status" command
 	* "Check DHCP" command
 	* "Enable DHCP" command
@@ -375,6 +377,28 @@ Error response:
 UI shows error message "Auto-update has failed"
 
 
+## API: Get global status
+
+Request:
+
+	GET /control/status
+
+Response:
+
+	200 OK
+
+	{
+	"dns_addresses":["..."],
+	"dns_port":53,
+	"http_port":3000,
+	"language":"en",
+	"protection_enabled":true,
+	"running":true,
+	"dhcp_available":true,
+	"version":"undefined"
+	}
+
+
 ## Enable DHCP server
 
 Algorithm:
@@ -389,6 +413,28 @@ Algorithm:
 * UI shows the status
 
 
+### "Show DHCP interfaces" command
+
+Request:
+
+	GET /control/dhcp/interfaces
+
+Response:
+
+	200 OK
+
+	{
+		"iface_name":{
+			"name":"iface_name",
+			"mtu":1500,
+			"hardware_address":"...",
+			"ip_addresses":["ipv4 addr","ipv6 addr", ...],
+			"flags":"up|broadcast|multicast"
+		}
+		...
+	}
+
+
 ### "Show DHCP status" command
 
 Request:
@@ -400,16 +446,19 @@ Response:
 	200 OK
 
 	{
-		"config":{
-			"enabled":false,
-			"interface_name":"...",
+		"enabled":false,
+		"interface_name":"...",
+		"v4":{
 			"gateway_ip":"...",
 			"subnet_mask":"...",
-			"range_start":"...",
+			"range_start":"...", // if empty: DHCPv4 won't be enabled
 			"range_end":"...",
 			"lease_duration":60,
-			"icmp_timeout_msec":0
 		},
+		"v6":{
+			"range_start":"...", // if empty: DHCPv6 won't be enabled
+			"lease_duration":60,
+		}
 		"leases":[
 			{"ip":"...","mac":"...","hostname":"...","expires":"..."}
 			...
@@ -468,14 +517,19 @@ Request:
 	POST /control/dhcp/set_config
 
 	{
-		"enabled":true,
-		"interface_name":"vboxnet0",
+	"enabled":true,
+	"interface_name":"vboxnet0",
+	"v4":{
 		"gateway_ip":"192.169.56.1",
 		"subnet_mask":"255.255.255.0",
-		"range_start":"192.169.56.3",
-		"range_end":"192.169.56.3",
+		"range_start":"192.169.56.100",
+		"range_end":"192.169.56.200", // Note: first 3 octects must match "range_start"
 		"lease_duration":60,
-		"icmp_timeout_msec":0
+	},
+	"v6":{
+		"range_start":"...",
+		"lease_duration":60,
+	}
 	}
 
 Response:
@@ -483,6 +537,10 @@ Response:
 	200 OK
 
 	OK
+
+For v4, if range_start = "1.2.3.4", the range_end must be "1.2.3.X" where X > 4.
+
+For v6, if range_start = "2001::1", the last IP is "2001:ff".
 
 
 ### Static IP check/set
