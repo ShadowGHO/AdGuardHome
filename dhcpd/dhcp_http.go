@@ -291,17 +291,7 @@ func (s *Server) handleDHCPFindActiveServer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	found, err := CheckIfOtherDHCPServersPresent(interfaceName)
-
-	othSrv := map[string]interface{}{}
-	foundVal := "no"
-	if found {
-		foundVal = "yes"
-	} else if err != nil {
-		foundVal = "error"
-		othSrv["error"] = err.Error()
-	}
-	othSrv["found"] = foundVal
+	found4, err4 := CheckIfOtherDHCPServersPresentV4(interfaceName)
 
 	staticIP := map[string]interface{}{}
 	isStaticIP, err := HasStaticIP(interfaceName)
@@ -315,9 +305,36 @@ func (s *Server) handleDHCPFindActiveServer(w http.ResponseWriter, r *http.Reque
 	}
 	staticIP["static"] = staticIPStatus
 
+	v4 := map[string]interface{}{}
+	othSrv := map[string]interface{}{}
+	foundVal := "no"
+	if found4 {
+		foundVal = "yes"
+	} else if err != nil {
+		foundVal = "error"
+		othSrv["error"] = err4.Error()
+	}
+	othSrv["found"] = foundVal
+	v4["other_server"] = othSrv
+	v4["static_ip"] = staticIP
+
+	found6, err6 := CheckIfOtherDHCPServersPresentV6(interfaceName)
+
+	v6 := map[string]interface{}{}
+	othSrv = map[string]interface{}{}
+	foundVal = "no"
+	if found6 {
+		foundVal = "yes"
+	} else if err != nil {
+		foundVal = "error"
+		othSrv["error"] = err6.Error()
+	}
+	othSrv["found"] = foundVal
+	v6["other_server"] = othSrv
+
 	result := map[string]interface{}{}
-	result["other_server"] = othSrv
-	result["static_ip"] = staticIP
+	result["v4"] = v4
+	result["v6"] = v6
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(result)
