@@ -52,14 +52,9 @@ const dhcp = handleActions(
             processingStatus: false,
         }),
         [actions.findActiveDhcpSuccess]: (state, { payload }) => {
-            const { other_server: otherServer, static_ip: staticIP } = payload;
-
             const newState = {
                 ...state,
-                check: {
-                    otherServer,
-                    staticIP,
-                },
+                check: payload,
                 processingStatus: false,
             };
             return newState;

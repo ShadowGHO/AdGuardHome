@@ -107,7 +107,8 @@ const Dhcp = () => {
     const enteredSomeValue = enteredSomeV4Value || enteredSomeV6Value || interfaceName;
 
     const getToggleDhcpButton = () => {
-        const otherDhcpFound = check && check.otherServer.found === STATUS_RESPONSE.YES;
+        const otherDhcpFound = check && (check.v4.other_server.found === STATUS_RESPONSE.YES
+                || check.v6.other_server.found === STATUS_RESPONSE.YES);
 
         const filledConfig = interface_name && (Object.values(v4)
             .every(Boolean) || Object.values(v6)
@@ -195,7 +196,10 @@ const Dhcp = () => {
         </PageTitle>
         {!processing && !processingInterfaces
         && <>
-            {!enabled && check && check.otherServer.found !== STATUS_RESPONSE.NO
+            {!enabled
+            && check
+            && (check.v4.other_server.found !== STATUS_RESPONSE.NO
+                    || check.v6.other_server.found !== STATUS_RESPONSE.NO)
             && <div className="mb-5">
                 <hr />
                 <div className="text-danger">

@@ -376,20 +376,24 @@ export const findActiveDhcp = (name) => async (dispatch, getState) => {
         const activeDhcp = await apiClient.findActiveDhcp(name);
         dispatch(findActiveDhcpSuccess(activeDhcp));
         const { check, interface_name } = getState().dhcp;
-        const { staticIP } = check ?? { staticIP: {} };
-        const { otherServer } = check ?? { otherServer: {} };
+        const v4 = check?.v4 ?? { static_ip: {}, other_server: {} };
+        const v6 = check?.v6 ?? { other_server: {} };
 
         let isError = false;
 
-        if (otherServer.found === STATUS_RESPONSE.ERROR) {
+        if (v4.other_server.found === STATUS_RESPONSE.ERROR
+                || v6.other_server.found === STATUS_RESPONSE.ERROR) {
             isError = true;
             dispatch(addErrorToast({ error: 'dhcp_error' }));
-            if (otherServer.error) {
-                dispatch(addErrorToast({ error: otherServer.error }));
+            if (v4.other_server.error) {
+                dispatch(addErrorToast({ error: v4.other_server.error }));
+            }
+            if (v6.other_server.error) {
+                dispatch(addErrorToast({ error: v6.other_server.error }));
             }
         }
 
-        if (staticIP.static === STATUS_RESPONSE.ERROR) {
+        if (v4.static_ip.static === STATUS_RESPONSE.ERROR) {
             isError = true;
             dispatch(addErrorToast({ error: 'dhcp_static_ip_error' }));
         }
@@ -398,12 +402,15 @@ export const findActiveDhcp = (name) => async (dispatch, getState) => {
             return;
         }
 
-        if (otherServer.found === STATUS_RESPONSE.YES) {
+        if (v4.other_server.found === STATUS_RESPONSE.YES
+                || v6.other_server.found === STATUS_RESPONSE.YES) {
             dispatch(addErrorToast({ error: 'dhcp_found' }));
-        } else if (staticIP.static === STATUS_RESPONSE.NO && staticIP.ip && interface_name) {
+        } else if (v4.static_ip.static === STATUS_RESPONSE.NO
+                && v4.static_ip.ip
+                && interface_name) {
             const warning = i18next.t('dhcp_dynamic_ip_found', {
                 interfaceName: interface_name,
-                ipAddress: staticIP.ip,
+                ipAddress: v4.static_ip.ip,
                 interpolation: {
                     prefix: '<0>{{',
                     suffix: '}}</0>',
