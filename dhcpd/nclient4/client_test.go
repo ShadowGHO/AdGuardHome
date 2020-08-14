@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build linux
+// github.com/hugelgupf/socketpair is Linux-only
 // +build go1.12
 
 package nclient4
