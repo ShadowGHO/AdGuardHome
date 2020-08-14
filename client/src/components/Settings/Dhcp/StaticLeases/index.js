@@ -4,6 +4,7 @@ import ReactTable from 'react-table';
 import { Trans, useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { LEASES_TABLE_DEFAULT_PAGE_SIZE } from '../../../../helpers/constants';
+import { sortIp } from '../../../../helpers/helpers';
 import Modal from './Modal';
 import { addStaticLease, removeStaticLease } from '../../../../actions';
 
@@ -53,6 +54,7 @@ const StaticLeases = ({
                     {
                         Header: 'IP',
                         accessor: 'ip',
+                        sortMethod: sortIp,
                         Cell: cellWrap,
                     },
                     {
@@ -68,21 +70,19 @@ const StaticLeases = ({
                         Cell: (row) => {
                             const { ip, mac, hostname } = row.original;
 
-                            return (
-                                <div className="logs__row logs__row--center">
-                                    <button
+                            return <div className="logs__row logs__row--center">
+                                <button
                                         type="button"
                                         className="btn btn-icon btn-icon--green btn-outline-secondary btn-sm"
                                         title={t('delete_table_action')}
                                         disabled={processingDeleting}
                                         onClick={() => handleDelete(ip, mac, hostname)}
-                                    >
-                                        <svg className="icons">
-                                            <use xlinkHref="#delete" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            );
+                                >
+                                    <svg className="icons">
+                                        <use xlinkHref="#delete" />
+                                    </svg>
+                                </button>
+                            </div>;
                         },
                     },
                 ]}
