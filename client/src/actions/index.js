@@ -432,7 +432,6 @@ export const setDhcpConfigFailure = createAction('SET_DHCP_CONFIG_FAILURE');
 
 export const setDhcpConfig = (values) => async (dispatch) => {
     dispatch(setDhcpConfigRequest());
-    dispatch(findActiveDhcp(values.interface_name));
     try {
         await apiClient.setDhcpConfig(values);
         dispatch(setDhcpConfigSuccess(values));
@@ -461,7 +460,6 @@ export const toggleDhcp = (values) => async (dispatch) => {
             enabled: true,
         };
         successMessage = 'enabled_dhcp';
-        dispatch(findActiveDhcp(values.interface_name));
     }
 
     try {
